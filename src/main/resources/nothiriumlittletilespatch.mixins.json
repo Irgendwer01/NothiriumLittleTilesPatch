@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "ru.V5Minecraft.NothiriumLittleTilesPatch.mixin",
+  "refmap": "nothiriumlittletilespatch.refmap.json",
+  "target": "@env(DEFAULT)",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "MixinEntityAnimation",
+    "MixinTileEntityLittleTiles"
+  ],
+  "client": [
+    "MixinRenderUtils",
+    "MixinRenderAnimation"
+  ]
+}

@@ -2,12 +2,14 @@ package ru.V5Minecraft.NothiriumLittleTilesPatch.LittleTilesPatches;
 
 import java.util.concurrent.locks.ReentrantLock;
 
-import meldexun.nothirium.mc.renderer.ChunkRenderManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.chunk.RenderChunk;
 import net.minecraft.util.math.BlockPos;
 
+import meldexun.nothirium.mc.renderer.ChunkRenderManager;
+
 public class NothiriumRenderChunkWrapper extends RenderChunk {
+
     private final int sectionX;
     private final int sectionY;
     private final int sectionZ;
@@ -31,10 +33,10 @@ public class NothiriumRenderChunkWrapper extends RenderChunk {
             int baseY = sectionY << 4;
             int baseZ = sectionZ << 4;
             if (Minecraft.getMinecraft().renderGlobal != null) {
-                Minecraft.getMinecraft().renderGlobal.markBlockRangeForRenderUpdate(baseX - 1, baseY - 1, baseZ - 1, baseX + 16, baseY + 16, baseZ + 16);
+                Minecraft.getMinecraft().renderGlobal.markBlockRangeForRenderUpdate(baseX - 1, baseY - 1, baseZ - 1,
+                        baseX + 16, baseY + 16, baseZ + 16);
             }
-        } catch (Exception e) {
-        }
+        } catch (Exception e) {}
     }
 
     @Override

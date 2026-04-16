@@ -1,12 +1,14 @@
 package ru.V5Minecraft.NothiriumLittleTilesPatch;
 
 import net.minecraft.launchwrapper.IClassTransformer;
+
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.*;
 
 public class LittleTilesASMTransformer implements IClassTransformer {
+
     private static final String TASK_COMPILE = "meldexun/nothirium/mc/renderer/chunk/RenderChunkTaskCompile";
     private static final String ABSTRACT_TASK = "meldexun/nothirium/renderer/chunk/AbstractRenderChunkTask";
     private static final String ABSTRACT_CHUNK = "meldexun/nothirium/renderer/chunk/AbstractRenderChunk";
@@ -38,7 +40,8 @@ public class LittleTilesASMTransformer implements IClassTransformer {
         reader.accept(classNode, 0);
 
         for (MethodNode method : classNode.methods) {
-            if (method.name.equals("compileSection") && method.desc.equals("(Lnet/minecraft/client/renderer/RegionRenderCacheBuilder;)Lmeldexun/nothirium/api/renderer/chunk/RenderChunkTaskResult;")) {
+            if (method.name.equals("compileSection") && method.desc.equals(
+                    "(Lnet/minecraft/client/renderer/RegionRenderCacheBuilder;)Lmeldexun/nothirium/api/renderer/chunk/RenderChunkTaskResult;")) {
                 patchCompileSection(method);
             }
 
@@ -69,30 +72,38 @@ public class LittleTilesASMTransformer implements IClassTransformer {
 
         InsnList patch = new InsnList();
         patch.add(new VarInsnNode(Opcodes.ALOAD, 0));
-        patch.add(new FieldInsnNode(Opcodes.GETFIELD, TASK_COMPILE, "chunkCache", "Lnet/minecraft/world/IBlockAccess;"));
+        patch.add(
+                new FieldInsnNode(Opcodes.GETFIELD, TASK_COMPILE, "chunkCache", "Lnet/minecraft/world/IBlockAccess;"));
         patch.add(new VarInsnNode(Opcodes.ALOAD, 0));
         patch.add(new FieldInsnNode(Opcodes.GETFIELD, ABSTRACT_TASK, "renderChunk", "L" + ABSTRACT_CHUNK + ";"));
-        patch.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, ABSTRACT_CHUNK, "getPos", "()L" + SECTION_POS + ";", false));
+        patch.add(
+                new MethodInsnNode(Opcodes.INVOKEVIRTUAL, ABSTRACT_CHUNK, "getPos", "()L" + SECTION_POS + ";", false));
         patch.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, SECTION_POS, "getBlockX", "()I", false));
         patch.add(new VarInsnNode(Opcodes.ALOAD, 0));
         patch.add(new FieldInsnNode(Opcodes.GETFIELD, ABSTRACT_TASK, "renderChunk", "L" + ABSTRACT_CHUNK + ";"));
-        patch.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, ABSTRACT_CHUNK, "getPos", "()L" + SECTION_POS + ";", false));
+        patch.add(
+                new MethodInsnNode(Opcodes.INVOKEVIRTUAL, ABSTRACT_CHUNK, "getPos", "()L" + SECTION_POS + ";", false));
         patch.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, SECTION_POS, "getBlockY", "()I", false));
         patch.add(new VarInsnNode(Opcodes.ALOAD, 0));
         patch.add(new FieldInsnNode(Opcodes.GETFIELD, ABSTRACT_TASK, "renderChunk", "L" + ABSTRACT_CHUNK + ";"));
-        patch.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, ABSTRACT_CHUNK, "getPos", "()L" + SECTION_POS + ";", false));
+        patch.add(
+                new MethodInsnNode(Opcodes.INVOKEVIRTUAL, ABSTRACT_CHUNK, "getPos", "()L" + SECTION_POS + ";", false));
         patch.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, SECTION_POS, "getBlockZ", "()I", false));
         patch.add(new VarInsnNode(Opcodes.ALOAD, 1));
-        patch.add(new MethodInsnNode(Opcodes.INVOKESTATIC, INTEGRATION, "appendLittleTilesData", "(Lnet/minecraft/world/IBlockAccess;IIILnet/minecraft/client/renderer/RegionRenderCacheBuilder;)V", false));
+        patch.add(new MethodInsnNode(Opcodes.INVOKESTATIC, INTEGRATION, "appendLittleTilesData",
+                "(Lnet/minecraft/world/IBlockAccess;IIILnet/minecraft/client/renderer/RegionRenderCacheBuilder;)V",
+                false));
 
         method.instructions.insertBefore(target, patch);
     }
 
     private void patchRenderBlockState(MethodNode method) {
         method.instructions.insert(method.instructions.getFirst(), new InsnList() {
+
             {
                 add(new VarInsnNode(Opcodes.ALOAD, 1));
-                add(new MethodInsnNode(Opcodes.INVOKESTATIC, INTEGRATION, "beginRenderBlock", "(L" + IBLOCK_STATE + ";)V", false));
+                add(new MethodInsnNode(Opcodes.INVOKESTATIC, INTEGRATION, "beginRenderBlock",
+                        "(L" + IBLOCK_STATE + ";)V", false));
             }
         });
 
@@ -114,7 +125,8 @@ public class LittleTilesASMTransformer implements IClassTransformer {
             if (insn.getOpcode() != Opcodes.INVOKEVIRTUAL) continue;
             MethodInsnNode min = (MethodInsnNode) insn;
             if (!min.owner.equals(VISIBILITY_GRAPH) || !min.name.equals("setOpaque")) continue;
-            method.instructions.set(insn, new MethodInsnNode(Opcodes.INVOKESTATIC, INTEGRATION, "setOpaque", "(L" + VISIBILITY_GRAPH + ";IIILmeldexun/nothirium/util/Direction;)V", false));
+            method.instructions.set(insn, new MethodInsnNode(Opcodes.INVOKESTATIC, INTEGRATION, "setOpaque",
+                    "(L" + VISIBILITY_GRAPH + ";IIILmeldexun/nothirium/util/Direction;)V", false));
         }
 
         for (AbstractInsnNode insn : method.instructions.toArray()) {
@@ -122,7 +134,12 @@ public class LittleTilesASMTransformer implements IClassTransformer {
             if (op != Opcodes.INVOKEVIRTUAL && op != Opcodes.INVOKEINTERFACE) continue;
             MethodInsnNode min = (MethodInsnNode) insn;
             if (!min.name.equals("doesSideBlockRendering") && !min.name.equals("func_176225_a")) continue;
-            method.instructions.set(insn, new MethodInsnNode(Opcodes.INVOKESTATIC, INTEGRATION, "doesSideBlockRendering", "(L" + IBLOCK_STATE + ";Lnet/minecraft/world/IBlockAccess;" + "Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/EnumFacing;)Z", false));
+            method.instructions
+                    .set(insn,
+                            new MethodInsnNode(Opcodes.INVOKESTATIC, INTEGRATION, "doesSideBlockRendering",
+                                    "(L" + IBLOCK_STATE + ";Lnet/minecraft/world/IBlockAccess;" +
+                                            "Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/EnumFacing;)Z",
+                                    false));
         }
 
         AbstractInsnNode canRenderInLayer = null;
@@ -144,7 +161,8 @@ public class LittleTilesASMTransformer implements IClassTransformer {
 
         InsnList skipPatch = new InsnList();
         skipPatch.add(new VarInsnNode(Opcodes.ALOAD, 1));
-        skipPatch.add(new MethodInsnNode(Opcodes.INVOKESTATIC, INTEGRATION, "shouldSkipBlockRender", "(L" + IBLOCK_STATE + ";)Z", false));
+        skipPatch.add(new MethodInsnNode(Opcodes.INVOKESTATIC, INTEGRATION, "shouldSkipBlockRender",
+                "(L" + IBLOCK_STATE + ";)Z", false));
         skipPatch.add(new JumpInsnNode(Opcodes.IFNE, returnLabel));
         method.instructions.insertBefore(loopLabel, skipPatch);
     }

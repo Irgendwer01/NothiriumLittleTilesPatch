@@ -1,19 +1,22 @@
-package ru.V5Minecraft.NothiriumLittleTilesPatch.mixin;
+package ru.V5Minecraft.NothiriumLittleTilesPatch.mixins;
 
-import com.creativemd.littletiles.client.render.world.RenderUtils;
+import java.lang.reflect.Method;
+import java.util.concurrent.ConcurrentHashMap;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ViewFrustum;
 import net.minecraft.client.renderer.chunk.RenderChunk;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
-import ru.V5Minecraft.NothiriumLittleTilesPatch.LittleTilesPatches.NothiriumRenderChunkWrapper;
 
-import java.lang.reflect.Method;
-import java.util.concurrent.ConcurrentHashMap;
+import com.creativemd.littletiles.client.render.world.RenderUtils;
+
+import ru.V5Minecraft.NothiriumLittleTilesPatch.LittleTilesPatches.NothiriumRenderChunkWrapper;
 
 @SideOnly(Side.CLIENT)
 @Mixin(value = RenderUtils.class, remap = false)
@@ -62,8 +65,7 @@ public abstract class MixinRenderUtils {
                             provider.getClass().getMethod("setDirty", int.class, int.class, int.class)
                                     .invoke(provider, sx, sy, sz);
                         }
-                    } catch (Exception ignored) {
-                    }
+                    } catch (Exception ignored) {}
                 });
                 return null;
             }

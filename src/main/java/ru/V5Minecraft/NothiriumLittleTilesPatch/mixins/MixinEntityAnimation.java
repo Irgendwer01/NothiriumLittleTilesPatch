@@ -1,11 +1,12 @@
-package ru.V5Minecraft.NothiriumLittleTilesPatch.mixin;
+package ru.V5Minecraft.NothiriumLittleTilesPatch.mixins;
 
-import com.creativemd.littletiles.client.render.world.LittleRenderChunkSuppilier;
-import com.creativemd.littletiles.common.entity.EntityAnimation;
-import com.creativemd.creativecore.common.world.CreativeWorld;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+
+import com.creativemd.creativecore.common.world.CreativeWorld;
+import com.creativemd.littletiles.client.render.world.LittleRenderChunkSuppilier;
+import com.creativemd.littletiles.common.entity.EntityAnimation;
 
 @Mixin(value = EntityAnimation.class, remap = false)
 public abstract class MixinEntityAnimation {

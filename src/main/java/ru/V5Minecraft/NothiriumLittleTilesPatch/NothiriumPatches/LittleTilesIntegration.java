@@ -6,8 +6,6 @@ import java.nio.ByteBuffer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import meldexun.nothirium.util.Direction;
-import meldexun.nothirium.util.VisibilityGraph;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.RegionRenderCacheBuilder;
@@ -19,7 +17,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
+import meldexun.nothirium.util.Direction;
+import meldexun.nothirium.util.VisibilityGraph;
+
 public class LittleTilesIntegration {
+
     private static final int BLOCK_VERTEX_STRIDE = 28;
 
     private static final int MAX_RETRY_TICKS = 120;
@@ -74,16 +76,19 @@ public class LittleTilesIntegration {
             teLittleTilesClass = Class.forName("com.creativemd.littletiles.common.tileentity.TileEntityLittleTiles");
             renderField = teLittleTilesClass.getField("render");
 
-            Class<?> renderManagerClass = Class.forName("com.creativemd.littletiles.client.render.world.TileEntityRenderManager");
+            Class<?> renderManagerClass = Class
+                    .forName("com.creativemd.littletiles.client.render.world.TileEntityRenderManager");
             getBufferCacheMethod = renderManagerClass.getMethod("getBufferCache");
             requestedIndexField = findField(renderManagerClass, "requestedIndex");
             buildingField = findField(renderManagerClass, "building");
             chunkUpdateMethod = renderManagerClass.getMethod("chunkUpdate", Object.class);
 
-            Class<?> bufferCacheClass = Class.forName("com.creativemd.littletiles.client.render.cache.LayeredRenderBufferCache");
+            Class<?> bufferCacheClass = Class
+                    .forName("com.creativemd.littletiles.client.render.cache.LayeredRenderBufferCache");
             queueField = findField(bufferCacheClass, "queue");
 
-            Class<?> renderDataCacheInterface = Class.forName("com.creativemd.littletiles.client.render.cache.IRenderDataCache");
+            Class<?> renderDataCacheInterface = Class
+                    .forName("com.creativemd.littletiles.client.render.cache.IRenderDataCache");
             byteBufferMethod = renderDataCacheInterface.getMethod("byteBuffer");
             lengthMethod = renderDataCacheInterface.getMethod("length");
 
@@ -95,11 +100,11 @@ public class LittleTilesIntegration {
 
             updateQuadCacheMethod = teLittleTilesClass.getMethod("updateQuadCache", Object.class);
 
-            available = blockTileClass != null && queueField != null && byteBufferField != null && vertexCountField != null && requestedIndexField != null && buildingField != null && updateQuadCacheMethod != null;
+            available = blockTileClass != null && queueField != null && byteBufferField != null &&
+                    vertexCountField != null && requestedIndexField != null && buildingField != null &&
+                    updateQuadCacheMethod != null;
 
-        } catch (ClassNotFoundException e) {
-        } catch (Exception e) {
-        }
+        } catch (ClassNotFoundException e) {} catch (Exception e) {}
     }
 
     private static Field findField(Class<?> clazz, String... names) {
@@ -108,8 +113,7 @@ public class LittleTilesIntegration {
                 Field f = clazz.getDeclaredField(name);
                 f.setAccessible(true);
                 return f;
-            } catch (NoSuchFieldException ignored) {
-            }
+            } catch (NoSuchFieldException ignored) {}
         }
         return null;
     }
@@ -137,7 +141,8 @@ public class LittleTilesIntegration {
         graph.setOpaque(x, y, z, dir);
     }
 
-    public static boolean doesSideBlockRendering(IBlockState blockState, IBlockAccess world, BlockPos pos, EnumFacing facing) {
+    public static boolean doesSideBlockRendering(IBlockState blockState, IBlockAccess world, BlockPos pos,
+                                                 EnumFacing facing) {
         if (!initialized) init();
         if (isBlockTile(blockState)) {
             blockTileDoesCount.incrementAndGet();
@@ -151,7 +156,8 @@ public class LittleTilesIntegration {
         return isBlockTile(blockState);
     }
 
-    public static void appendLittleTilesData(IBlockAccess chunkCache, int baseX, int baseY, int baseZ, RegionRenderCacheBuilder buffers) {
+    public static void appendLittleTilesData(IBlockAccess chunkCache, int baseX, int baseY, int baseZ,
+                                             RegionRenderCacheBuilder buffers) {
         if (!initialized) init();
 
         int setOpaqueCount = blockTileSetOpaqueCount.getAndSet(0);
@@ -199,14 +205,12 @@ public class LittleTilesIntegration {
                             if (chunkUpdateMethod != null) {
                                 try {
                                     chunkUpdateMethod.invoke(renderManager, (Object) null);
-                                } catch (Exception ignored) {
-                                }
+                                } catch (Exception ignored) {}
                             }
                             if (requestedIndex == -1 && !building && updateQuadCacheMethod != null) {
                                 try {
                                     updateQuadCacheMethod.invoke(te, (Object) null);
-                                } catch (Exception ignored) {
-                                }
+                                } catch (Exception ignored) {}
                             }
                             continue;
                         }
@@ -232,8 +236,7 @@ public class LittleTilesIntegration {
                             if (chunkUpdateMethod != null) {
                                 try {
                                     chunkUpdateMethod.invoke(renderManager, (Object) null);
-                                } catch (Exception ignored) {
-                                }
+                                } catch (Exception ignored) {}
                             }
                             continue;
                         }
@@ -270,7 +273,8 @@ public class LittleTilesIntegration {
         pendingSections.clear();
     }
 
-    private static void appendTileData(TileEntity te, int baseX, int baseY, int baseZ, RegionRenderCacheBuilder buffers) {
+    private static void appendTileData(TileEntity te, int baseX, int baseY, int baseZ,
+                                       RegionRenderCacheBuilder buffers) {
         try {
             Object renderManager = renderField.get(te);
             if (renderManager == null) return;
@@ -316,7 +320,6 @@ public class LittleTilesIntegration {
                 int added = length / BLOCK_VERTEX_STRIDE;
                 vertexCountField.setInt(builder, currentCount + added);
             }
-        } catch (Exception e) {
-        }
+        } catch (Exception e) {}
     }
 }
